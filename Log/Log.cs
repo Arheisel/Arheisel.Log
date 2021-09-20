@@ -22,7 +22,7 @@ namespace Arheisel.Log
         {
             queue = new ConcurrentQueue<KeyValuePair<string, string>>();
 
-            thread = new Thread(new ThreadStart(WriteThread));
+            thread = new Thread(new ThreadStart(WriteThread)) { IsBackground = true };
             thread.Start();
 
             Write(TYPE_INFO, "========================= PROGRAM START =========================");

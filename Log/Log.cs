@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace Arheisel.Log
@@ -79,15 +80,23 @@ namespace Arheisel.Log
         {
             while (true)
             {
-                if (queue.TryDequeue(out KeyValuePair<string, string> log))
+                if (!queue.IsEmpty)
                 {
-                    WriteFile(log.Key, log.Value);
+                    var sb = new StringBuilder();
+                    while (queue.TryDequeue(out KeyValuePair<string, string> log))
+                    {
+                        sb.Append(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss "));
+                        sb.Append(log.Key);
+                        sb.Append(": ");
+                        sb.AppendLine(log.Value);
+                    }
+                    WriteToFile(sb.ToString());
                 }
                 Thread.Sleep(50);
             }
         }
 
-        private static void WriteFile(string type, string message)
+        private static void WriteToFile(string data)
         {
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
@@ -101,14 +110,14 @@ namespace Arheisel.Log
                 // Create a file to write to.   
                 using (StreamWriter sw = File.CreateText(filepath))
                 {
-                    sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + type + ": " + message);
+                    sw.Write(data);
                 }
             }
             else
             {
                 using (StreamWriter sw = File.AppendText(filepath))
                 {
-                    sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + type + ": " + message);
+                    sw.Write(data);
                 }
             }
         }

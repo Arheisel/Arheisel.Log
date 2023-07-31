@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Arheisel.Log
 {
-    public class Log
+    public static class Log
     {
         public const string TYPE_DEBUG = "DEBUG";
         public const string TYPE_INFO = "INFO";
@@ -15,12 +15,14 @@ namespace Arheisel.Log
         public const string TYPE_ERROR = "ERROR";
         public const string TYPE_EXCEPTION = "EXCEPTION";
 
-        private static Thread thread;
+        private static Thread thread = null;
         private static ConcurrentQueue<KeyValuePair<string, string>> queue;
 
 
         public static void Start()
         {
+            if (thread != null || thread.IsAlive) return;
+
             queue = new ConcurrentQueue<KeyValuePair<string, string>>();
 
             thread = new Thread(new ThreadStart(WriteThread)) { IsBackground = true };
@@ -31,6 +33,7 @@ namespace Arheisel.Log
 
         public static void Stop()
         {
+            if(thread == null || !thread.IsAlive) return;
             thread.Abort();
         }
 
@@ -98,7 +101,6 @@ namespace Arheisel.Log
 
         private static void WriteToFile(string data)
         {
-
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
             if (!Directory.Exists(path))
             {

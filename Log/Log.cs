@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Arheisel.Log
 {
@@ -17,6 +18,8 @@ namespace Arheisel.Log
 
         private static Thread thread = null;
         private static ConcurrentQueue<KeyValuePair<string, string>> queue;
+        private static CancellationTokenSource cts;
+        private static ManualResetEvent threadStoppedEvent;
 
 
         public static void Start()
@@ -24,7 +27,8 @@ namespace Arheisel.Log
             if (thread != null || thread.IsAlive) return;
 
             queue = new ConcurrentQueue<KeyValuePair<string, string>>();
-
+            cts = new CancellationTokenSource();
+            threadStoppedEvent = new ManualResetEvent(false);
             thread = new Thread(new ThreadStart(WriteThread)) { IsBackground = true };
             thread.Start();
 
@@ -34,7 +38,8 @@ namespace Arheisel.Log
         public static void Stop()
         {
             if(thread == null || !thread.IsAlive) return;
-            thread.Abort();
+            cts.Cancel();
+            if (!threadStoppedEvent.WaitOne(100) && thread.IsAlive) thread.Abort();
         }
 
         public static void Write(string type, string message)
@@ -46,7 +51,7 @@ namespace Arheisel.Log
             {
                 Console.WriteLine(type + ": " + message);
             }
-            queue.Enqueue(new KeyValuePair<string, string>(type, message));
+            queue?.Enqueue(new KeyValuePair<string, string>(type, message));
         }
 
         public static void Write(Exception e)
@@ -95,8 +100,10 @@ namespace Arheisel.Log
                     }
                     WriteToFile(sb.ToString());
                 }
+                if (cts.IsCancellationRequested) break;
                 Thread.Sleep(50);
             }
+            threadStoppedEvent.Set();
         }
 
         private static void WriteToFile(string data)

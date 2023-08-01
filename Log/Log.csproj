@@ -7,8 +7,8 @@
     <ProjectGuid>{C00975A9-0CB2-480C-87EE-B5935A460FFA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Log</RootNamespace>
-    <AssemblyName>Log</AssemblyName>
+    <RootNamespace>Arheisel.Log</RootNamespace>
+    <AssemblyName>Arheisel.Log</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

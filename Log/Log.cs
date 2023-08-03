@@ -16,11 +16,13 @@ namespace Arheisel.Log
         public const string TYPE_ERROR = "ERROR";
         public const string TYPE_EXCEPTION = "EXCEPTION";
 
+        public static string OutputDir { get; set; } = "Logs";
+        public static string LogName { get; set; } = "ServiceLog";
+
         private static Thread thread = null;
         private static ConcurrentQueue<KeyValuePair<string, string>> queue;
         private static CancellationTokenSource cts;
         private static ManualResetEvent threadStoppedEvent;
-
 
         public static void Start()
         {
@@ -108,12 +110,12 @@ namespace Arheisel.Log
 
         private static void WriteToFile(string data)
         {
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, OutputDir);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            string filepath = Path.Combine(path, DateTime.Now.ToString("yyyy_MM_dd") + "_ServiceLog.txt");
+            string filepath = Path.Combine(path, $"{LogName}_{DateTime.Now:yyyy_MM_dd}.txt");
             if (!File.Exists(filepath))
             {
                 // Create a file to write to.   

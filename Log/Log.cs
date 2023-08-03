@@ -21,6 +21,7 @@ namespace Arheisel.Log
 
         private static Thread thread = null;
         private static ConcurrentQueue<KeyValuePair<string, string>> queue;
+
         private static CancellationTokenSource cts;
         private static ManualResetEvent threadStoppedEvent;
 

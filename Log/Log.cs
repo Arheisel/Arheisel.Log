@@ -26,7 +26,7 @@ namespace Arheisel.Log
 
         public static void Start()
         {
-            if (thread != null || thread.IsAlive) return;
+            if (thread != null || (thread?.IsAlive ?? false)) return;
 
             queue = new ConcurrentQueue<KeyValuePair<string, string>>();
             cts = new CancellationTokenSource();
